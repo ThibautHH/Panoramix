@@ -1,0 +1,55 @@
+name: Status-checks workflow
+on:
+  workflow_dispatch:
+  pull_request:
+
+env:
+  EXECUTABLES: "panoramix"
+
+jobs:
+  coding-style:
+    runs-on: ubuntu-latest
+    container: ghcr.io/epitech/coding-style-checker
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run coding style
+        run: |
+          check.sh $(pwd) $(pwd)
+          if [ -s coding-style-reports.log ]; then
+            cat coding-style-reports.log | while read line; do
+              echo "::error file=$(echo "$line" | cut -d: -f1),line=$(echo "$line" | cut -d: -f2),title=$(echo "$line" | cut -d: -f3 | xargs) coding style error::$(echo "$line" | cut -d: -f4)"
+            done
+          fi
+
+  compile-program:
+    runs-on: ubuntu-latest
+    container: epitechcontent/epitest-docker
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make
+        timeout-minutes: 2
+        run: |
+          make
+
+      - name: Clean
+        run: |
+          make clean
+
+      - name: Check for executables
+        run: |
+          for executable in "$EXECUTABLES"; do
+            [ -f "$executable" ] && [ -x "$executable" ] && continue
+            echo '::error title=Compilation error::Executable '"$executable"' not found'
+          done
+
+      - name: Full clean
+        run: |
+          make fclean
+          for executable in "$EXECUTABLES"; do
+            [ ! -f "$executable" ] && continue
+            echo '::error title=Make 'fclean' rule error::Executable '"$executable"' still present'
+          done
