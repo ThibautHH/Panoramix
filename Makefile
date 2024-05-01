@@ -94,11 +94,11 @@ GCCFLAGS				=	$(PCHFLAGS) $(PROJECT_INCLUDE_DIRS:%=-iquote %)	\
 							-fno-gnu-unique $(if $($(NAME)_SHARED),,-fPIC)
 CXXFLAGS				=	$(GCCFLAGS) -std=c++20
 CFLAGS					=	$(GCCFLAGS) -std=c99
-ifdef CPP
+ifeq ($(LANG),cpp)
 COMPILER				:=	$(CXX)
 LINKER					:=	$(CXX)
 FLAGS					:=	$(CXXFLAGS)
-else
+else ifeq ($(LANG), c)
 COMPILER				:=	$(CC)
 LINKER					:=	$(CC)
 FLAGS					:=	$(CFLAGS)
