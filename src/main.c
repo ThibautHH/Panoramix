@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 static const char USAGE[] = "USAGE: ./panoramix <nb_villagers> <pot_size>"
-    " <nb_fights> <nb_refills>";
+" <nb_fights> <nb_refills>";
 
 static _Bool is_whitespace(const char *str)
 {
@@ -21,7 +21,7 @@ static _Bool is_whitespace(const char *str)
     return 1;
 }
 
-static signed char parse_args(long *numbers, const char * const *argv)
+static signed char parse_args(long *numbers, const char *const *argv)
 {
     unsigned char i = 0;
     char *endptr;
@@ -40,7 +40,7 @@ static signed char parse_args(long *numbers, const char * const *argv)
     return (i == 4) ? 1 : 0;
 }
 
-int main(int argc, const char * const *argv)
+int main(int argc, const char *const *argv)
 {
     long numbers[4];
     char result;
