@@ -8,6 +8,7 @@
 #ifndef PANORAMIX_H_
     #define PANORAMIX_H_
 
+    #include <errno.h>
     #include <pthread.h>
     #include <semaphore.h>
     #include <stdio.h>
@@ -16,12 +17,16 @@
 
     #define _CANCELLED(c) (c && status != PTHREAD_CANCELED)
     #define INVALID_STATUS(c) _CANCELLED(c) || (!c && status != NULL)
+    #define _SEM_INIT(sem) (&d->pot->sem##_initialized)
+    #define DESTORY_SEM(sem) (_SEM_INIT(sem) && sem_destroy(&d->pot->sem))
 
 typedef struct pot_s {
     unsigned long size;
-    unsigned long drinks_left;
     pthread_mutex_t laddle;
-    sem_t awareness;
+    sem_t drinks;
+    _Bool drinks_initialized;
+    sem_t emptiness;
+    _Bool emptiness_initialized;
 } pot_t;
 
 typedef struct druid_s {
@@ -36,7 +41,9 @@ typedef struct villager_s {
     unsigned long fights_left;
     pot_t *pot;
     _Bool is_fighting;
+    _Bool is_running;
     pthread_t thread;
+    pthread_mutex_t weapon;
     SLIST_ENTRY(villager_s) next;
 } villager_t;
 
