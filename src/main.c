@@ -7,8 +7,8 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "panoramix.h"
 
 static const char USAGE[] = "USAGE: ./panoramix <nb_villagers> <pot_size>"
 " <nb_fights> <nb_refills>";
@@ -55,6 +55,6 @@ int main(int argc, const char *const *argv)
     else if (!result)
         fprintf(stderr, "%s\n", USAGE);
     else
-        return 0;
+        return panoramix(numbers[0], numbers[1], numbers[2], numbers[3]);
     return 84;
 }
