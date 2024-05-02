@@ -68,9 +68,11 @@ static int ready_villagers(struct villagers_s *villagers, druid_t *druid)
             return free_villagers(84, villagers, druid);
     SLIST_FOREACH(v, villagers, next)
         pthread_mutex_unlock(&v->weapon);
+    pthread_mutex_lock(&druid->herbs);
     if (pthread_create(&druid->thread, NULL, druid_thread, druid))
         return free_villagers(84, villagers, druid);
     druid->is_brewing = 1;
+    pthread_mutex_unlock(&druid->herbs);
     return free_villagers(0, villagers, druid);
 }
 
@@ -79,7 +81,7 @@ int panoramix(unsigned long villager_count, unsigned long pot_size,
 {
     struct villagers_s villagers = SLIST_HEAD_INITIALIZER(villagers_s);
     pot_t pot = {pot_size, PTHREAD_MUTEX_INITIALIZER, {{0}}, 0, {{0}}, 0};
-    druid_t druid = {refill_count, &pot, 0, 0};
+    druid_t druid = {refill_count, &pot, 0, 0, PTHREAD_MUTEX_INITIALIZER};
 
     if (!create_villagers(&villagers, &pot, villager_count, fight_count))
         return 84;

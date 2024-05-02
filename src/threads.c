@@ -51,13 +51,13 @@ void *druid_thread(void *arg)
 {
     druid_t *d = arg;
 
-    printf("Druid: I'm ready... but sleepy...\n");
+    pthread_mutex_lock(&d->herbs);
     for (; d->refills_left; d->refills_left--) {
         sem_wait(&d->pot->emptiness);
         printf(DRUID_REFILLING, d->refills_left - 1);
         for (unsigned long i = d->pot->size; i; i--)
             sem_post(&d->pot->drinks);
     }
-    printf("Druid: I'm out of viscum. I'm going back to... zZz\n");
+    pthread_mutex_unlock(&d->herbs);
     return NULL;
 }

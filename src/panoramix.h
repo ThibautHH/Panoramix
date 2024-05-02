@@ -34,6 +34,7 @@ typedef struct druid_s {
     pot_t *pot;
     _Bool is_brewing;
     pthread_t thread;
+    pthread_mutex_t herbs;
 } druid_t;
 
 typedef struct villager_s {
