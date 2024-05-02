@@ -21,6 +21,7 @@ jobs:
             cat coding-style-reports.log | while read line; do
               echo "::error file=$(echo "$line" | cut -d: -f1),line=$(echo "$line" | cut -d: -f2),title=$(echo "$line" | cut -d: -f3 | xargs) coding style error::$(echo "$line" | cut -d: -f4)"
             done
+            exit 1
           fi
 
   compile-program:
@@ -44,6 +45,7 @@ jobs:
           for executable in "$EXECUTABLES"; do
             [ -f "$executable" ] && [ -x "$executable" ] && continue
             echo '::error title=Compilation error::Executable '"$executable"' not found'
+            exit 1
           done
 
       - name: Full clean
@@ -52,4 +54,5 @@ jobs:
           for executable in "$EXECUTABLES"; do
             [ ! -f "$executable" ] && continue
             echo '::error title=Make 'fclean' rule error::Executable '"$executable"' still present'
+            exit 1
           done
