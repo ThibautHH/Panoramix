@@ -56,4 +56,42 @@ int panoramix(unsigned long villager_count, unsigned long pot_size,
 void *druid_thread(void *arg);
 void *villager_thread(void *arg);
 
+    #define V_READY "Villager %lu: Going into battle!\n"
+
+    #define _THIRST "I see %d servings left.\n"
+    #define _THIRSTY "Villager %lu: I need a drink... " _THIRST
+
+    #define _DRINKS "We need more potion.\n"
+    #define _NO_DRINKS "Villager %lu: Hey Pano wake up! " _DRINKS
+
+    #define _FIGHT "Only %lu left.\n"
+    #define _FIGHTING "Villager %lu: Take that roman scum! " _FIGHT
+
+    #define V_DONE "Villager %lu: I'm going to sleep now.\n"
+
+    #define D_READY "Druid: I'm ready... but sleepy...\n"
+
+    #define _LING "I can only make %lu more refills after this one.\n"
+    #define _REFIL "Working on it! Beware " _LING
+    #define _REFILLING "Druid: Ah! Yes, yes, I'm awake! " _REFIL
+
+    #define D_DONE "Druid: I'm out of viscum. I'm going back to... zZz\n"
+
+    #define _V_FORMATS fght[] = _FIGHTING, done[] = V_DONE
+    #define V_FORMATS rdy[] = V_READY, thrst[] = _THIRSTY, _V_FORMATS
+
+    #define D_FORMATS rdy[] = D_READY, rfl[] = _REFILLING, done[] = D_DONE
+
+static inline void drink(villager_t *v)
+{
+    const char fmt[] = _NO_DRINKS;
+
+    errno = 0;
+    if (sem_trywait(&v->pot->drinks) && errno == EAGAIN) {
+        printf(fmt, v->id);
+        sem_post(&v->pot->emptiness);
+        sem_wait(&v->pot->drinks);
+    }
+}
+
 #endif /* !PANORAMIX_H_ */
