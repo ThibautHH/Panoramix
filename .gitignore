@@ -8,11 +8,13 @@
 # Ignore object files
 obj/main.o
 obj/panoramix.o
+obj/threads.o
 
 
 # Ignore dependency files
 obj/main.d
 obj/panoramix.d
+obj/threads.d
 
 
 # Ignore binary files

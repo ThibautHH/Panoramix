@@ -52,4 +52,7 @@ SLIST_HEAD(villagers_s, villager_s);
 int panoramix(unsigned long villager_count, unsigned long pot_size,
     unsigned long fight_count, unsigned long refill_count);
 
+void *druid_thread(void *arg);
+void *villager_thread(void *arg);
+
 #endif /* !PANORAMIX_H_ */

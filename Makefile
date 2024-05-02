@@ -41,7 +41,7 @@ $(NAME)_TESTS			:=	$(NAME)_tests
 
 $(NAME)_MAIN_SRC		:=	$(SRC_DIR)main$(SRC_EXT)
 $(NAME)_SRCS			:=	$(addprefix $(SRC_DIR), $(addsuffix $(SRC_EXT),	\
-								panoramix									\
+								panoramix threads							\
 							))
 $($(NAME)_TESTS)_SRCS	:=	$(shell find $(TESTS_DIR) -type f				\
 							-name '*$(SRC_EXT)' ! -name ".*" 2>/dev/null)
