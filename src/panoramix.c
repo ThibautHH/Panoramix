@@ -6,10 +6,15 @@
 */
 
 #include "panoramix.h"
-#include <semaphore.h>
 
 static const char DRUID_REFILLING[] = "Druid: Ah! Yes, yes, I'm awake! "
 "Working on it! Beware I can only make %lu more refills after this one.\n";
+static const char VILLAGER_THIRSTY[] = "Villager %lu: I need a drink... "
+"I see %lu servings left.\n";
+static const char VILLAGER_NO_DRINKS[] = "Villager %lu: Hey Pano wake up! "
+"We need more potion.\n";
+static const char VILLAGER_FIGHTING[] = "Villager %lu: Take that roman scum! "
+"Only %lu left.\n";
 
 static _Bool create_villagers(struct villagers_s *villagers, pot_t *pot,
     unsigned long villager_count, unsigned long fight_count)
@@ -39,17 +44,13 @@ static int free_villagers(int exit, struct villagers_s *villagers,
         SLIST_REMOVE_HEAD(villagers, next);
         if (v->is_fighting)
             pthread_cancel(v->thread);
-        if (pthread_join(v->thread, &status)
-            || (v->is_fighting && status != PTHREAD_CANCELED)
-            || (!v->is_fighting && status != NULL))
+        if (pthread_join(v->thread, &status) || INVALID_STATUS(v->is_fighting))
             exit = 84;
         free(v);
     }
     if (d->is_brewing)
         pthread_cancel(d->thread);
-    if (pthread_join(d->thread, &status)
-        || (d->is_brewing && status != PTHREAD_CANCELED)
-        || (!d->is_brewing && status != NULL)
+    if (pthread_join(d->thread, &status) || INVALID_STATUS(d->is_brewing)
         || sem_destroy(&d->pot->awareness))
         exit = 84;
     return exit;
@@ -63,18 +64,15 @@ static void *villager_thread(void *arg)
     printf("Villager %lu: Going into battle!\n", v->id);
     for (; v->fights_left; v->fights_left--) {
         pthread_mutex_lock(&v->pot->laddle);
-        printf("Villager %lu: I need a drink... I see %lu servings left.\n",
-            v->id, v->pot->drinks_left);
+        printf(VILLAGER_THIRSTY, v->id, v->pot->drinks_left);
         if (!v->pot->drinks_left) {
             sem_post(&v->pot->awareness);
-            printf("Villager %lu: Hey Pano wake up! We need more potion.\n",
-                v->id);
+            printf(VILLAGER_NO_DRINKS, v->id);
             sem_wait(&v->pot->awareness);
         } else
             v->pot->drinks_left--;
         pthread_mutex_unlock(&v->pot->laddle);
-        printf("Villager %lu: Take that roman scum! Only %lu left.\n",
-            v->id, v->fights_left - 1);
+        printf(VILLAGER_FIGHTING, v->id, v->fights_left - 1);
     }
     printf("Villager %lu: I'm going to sleep now.\n", v->id);
     v->is_fighting = 0;

@@ -14,6 +14,9 @@
     #include <stdlib.h>
     #include <sys/queue.h>
 
+    #define _CANCELLED(c) (c && status != PTHREAD_CANCELED)
+    #define INVALID_STATUS(c) _CANCELLED(c) || (!c && status != NULL)
+
 typedef struct pot_s {
     unsigned long size;
     unsigned long drinks_left;
